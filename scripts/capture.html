@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>stabilType capture</title>
+		<style>
+			/* Variable Merriweather (wght + opsz axes) — the same face the live demo uses. */
+			@font-face {
+				font-family: "Merriweather";
+				src: url("/site/public/fonts/Merriweather.woff2") format("woff2");
+				font-weight: 300 900;
+				font-style: normal;
+				font-display: block;
+			}
+			* { box-sizing: border-box; }
+			/* Transparent page → Playwright omitBackground keeps rounded-card corners clean. */
+			body { margin: 0; background: transparent; }
+			#stage { display: flex; flex-direction: column; gap: 28px; padding: 40px; width: max-content; }
+			.scene { width: 880px; padding: 34px 40px; border-radius: 16px; }
+			/* Fixed-size hero stage so per-frame tilt never changes the captured box
+			   (ffmpeg requires every GIF frame to share identical dimensions). */
+			#hero { height: 300px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+			#hero .card { width: 100%; }
+			.card {
+				border-radius: 12px;
+				padding: 26px 30px;
+				background: rgba(212,184,240,0.05);
+				border: 1px solid rgba(212,184,240,0.14);
+				transform-origin: center center;
+				will-change: transform;
+			}
+			.card p {
+				font-family: "Merriweather", serif;
+				font-size: 20px;
+				line-height: 1.7;
+				margin: 0;
+				color: var(--fg, #ededed);
+			}
+			.card p + p { margin-top: 16px; opacity: 0.7; }
+			.lbl {
+				font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				margin-bottom: 14px;
+				color: var(--fg, #ededed);
+				opacity: 0.5;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="stage"></div>
+		<!-- The built bundle statically imports the React entry points even though the
+		     capture only exercises the vanilla core. Map the bare React specifiers to
+		     a no-op module so the browser can resolve them without bundling React. -->
+		<script type="importmap">
+			{
+				"imports": {
+					"react": "data:text/javascript,export const useRef=()=>({current:null});export const useEffect=()=>{};export default {};",
+					"react/jsx-runtime": "data:text/javascript,export const jsx=()=>null;export const jsxs=()=>null;export const Fragment=null;",
+					"react-dom": "data:text/javascript,export default {};"
+				}
+			}
+		</script>
+		<script type="module">
+			import { applyStabilType } from "/dist/index.js";
+
+			const PARA_1 = "Typography has always assumed a fixed observer. The reader is still, the page is still, and every spacing decision optimises for that arrangement.";
+			const PARA_2 = "stabilType acknowledges the moving reader — perspective compresses and the text plane tilts in the direction of travel, then settles the moment motion stops.";
+
+			// Options chosen to read clearly in a still/loop: pronounced weight, tilt, perspective.
+			const OPTIONS = {
+				trackingRange: [0, 0.08],
+				weightRange: [300, 800],
+				opszRange: [10, 40],
+				opacityRange: [1, 1],
+				perspective: 520,
+				tilt: 7,
+				slntRange: [0, 0],
+				smoothing: 1, // snap instantly — each frame's velocity is the value we want shown
+			};
+
+			const FG = "#efe7fb";
+
+			// Build a labelled card whose <p> elements receive the effect.
+			function makeCard(label) {
+				const card = document.createElement("div");
+				card.className = "card";
+				const p1 = document.createElement("p");
+				p1.textContent = PARA_1;
+				const p2 = document.createElement("p");
+				p2.textContent = PARA_2;
+				card.append(p1, p2);
+				const wrap = document.createElement("div");
+				if (label) {
+					const l = document.createElement("div");
+					l.className = "lbl";
+					l.textContent = label;
+					l.style.color = FG;
+					wrap.appendChild(l);
+				}
+				wrap.appendChild(card);
+				return { wrap, card };
+			}
+
+			const stage = document.getElementById("stage");
+			const BG = "#0c0a12";
+
+			// ── Hero scene: a single animated card we drive frame-by-frame. ──
+			const heroScene = document.createElement("div");
+			heroScene.className = "scene";
+			heroScene.id = "hero";
+			heroScene.style.background = BG;
+			heroScene.style.setProperty("--fg", FG);
+			const hero = makeCard(null);
+			heroScene.appendChild(hero.wrap);
+			stage.appendChild(heroScene);
+
+			// ── States scene: three static cards at rest / mid / peak velocity. ──
+			const statesScene = document.createElement("div");
+			statesScene.className = "scene";
+			statesScene.id = "states";
+			statesScene.style.background = BG;
+			statesScene.style.setProperty("--fg", FG);
+			statesScene.style.display = "flex";
+			statesScene.style.flexDirection = "column";
+			statesScene.style.gap = "26px";
+			const rest = makeCard("at rest · velocity 0");
+			const mid  = makeCard("scrolling · velocity 0.5");
+			const peak = makeCard("fast scroll · velocity 1.0");
+			statesScene.append(rest.wrap, mid.wrap, peak.wrap);
+			stage.appendChild(statesScene);
+
+			// Apply the real algorithm to each states card at a fixed velocity.
+			applyStabilType(rest.card, { x: 0, y: 0 },    OPTIONS);
+			applyStabilType(mid.card,  { x: 0.15, y: 0.5 }, OPTIONS);
+			applyStabilType(peak.card, { x: 0.3,  y: 1.0 }, OPTIONS);
+
+			// Expose a driver so the capture script can set the hero velocity per frame.
+			window.__setHero = (vx, vy) => {
+				applyStabilType(hero.card, { x: vx, y: vy }, OPTIONS);
+			};
+			window.__setHero(0, 0);
+
+			window.__ready = document.fonts.ready;
+		</script>
+	</body>
+</html>
