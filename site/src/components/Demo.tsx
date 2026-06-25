@@ -296,7 +296,7 @@ function LiveReadout({
 					width: 40,
 					height: 40,
 					borderRadius: '50%',
-					border: '1px solid rgba(255,255,255,0.15)',
+					border: '1px solid color-mix(in oklch, var(--foreground) 15%, transparent)',
 					position: 'relative',
 					flexShrink: 0,
 				}}
