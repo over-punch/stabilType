@@ -205,8 +205,8 @@ export default function Demo() {
 				ref={cardRef}
 				className="rounded-lg p-6 flex flex-col gap-5"
 				style={{
-					background: 'rgba(212,184,240,0.04)',
-					border: '1px solid rgba(212,184,240,0.12)',
+					background: 'color-mix(in oklch, var(--foreground) 4%, transparent)',
+					border: '1px solid color-mix(in oklch, var(--foreground) 12%, transparent)',
 					transformOrigin: 'center center',
 					willChange: 'transform',
 				}}
@@ -305,7 +305,7 @@ function LiveReadout({
 					width: 6,
 					height: 6,
 					borderRadius: '50%',
-					background: 'rgba(212,184,240,0.8)',
+					background: 'color-mix(in oklch, var(--foreground) 80%, transparent)',
 					position: 'absolute',
 					top: '50%',
 					left: '50%',
