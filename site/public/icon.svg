@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#1a1207"/>
+  <rect width="64" height="64" rx="14" fill="#315264"/>
   <!-- Diagonal motion line (device tilt / movement) -->
-  <line x1="10" y1="54" x2="42" y2="10" stroke="#f8f4ef" stroke-width="1.5" opacity="0.25" stroke-dasharray="3 3"/>
-  <polygon points="42,10 34,16 39,19" fill="#f8f4ef" opacity="0.25"/>
+  <line x1="10" y1="54" x2="42" y2="10" stroke="#f0f6fa" stroke-width="1.5" opacity="0.25" stroke-dasharray="3 3"/>
+  <polygon points="42,10 34,16 39,19" fill="#f0f6fa" opacity="0.25"/>
   <!-- Stable horizontal text lines (motion-compensated output) -->
-  <rect x="13" y="22" width="38" height="8" rx="4" fill="#f8f4ef"/>
-  <rect x="13" y="35" width="30" height="8" rx="4" fill="#f8f4ef" opacity="0.75"/>
-  <rect x="13" y="48" width="22" height="8" rx="4" fill="#f8f4ef" opacity="0.5"/>
+  <rect x="13" y="22" width="38" height="8" rx="4" fill="#f0f6fa"/>
+  <rect x="13" y="35" width="30" height="8" rx="4" fill="#f0f6fa" opacity="0.75"/>
+  <rect x="13" y="48" width="22" height="8" rx="4" fill="#f0f6fa" opacity="0.5"/>
 </svg>
