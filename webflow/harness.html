@@ -1,0 +1,70 @@
+<!doctype html>
+<!-- webflow/harness.html — local proof page for the stabilType Webflow embed bundle.
+     Serve this over http (e.g. `npx serve .` from the repo root, or open directly) and scroll.
+
+     WHAT "WORKING" LOOKS LIKE:
+     - At rest the heading sits at wght 300, opsz 12, no extra letter-spacing, full opacity, flat.
+     - While scrolling (especially fast flicks) the heading tightens/loosens: letters space out,
+       weight climbs toward 600, optical size grows toward 24, opacity dips, and it tilts in 3D
+       (perspective + rotateX) following scroll direction. It settles back to rest a moment after
+       you stop scrolling.
+     - Under OS "reduce motion" the effect is disabled entirely and the heading stays static.
+     - In the console: `window.StabilType` should be an object exposing init() and destroy(). -->
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>stabilType — Webflow embed harness</title>
+	<!-- Roboto Flex: a variable font carrying wght, opsz, and slnt axes so every effect is visible. -->
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,slnt,wght@8..144,-10..0,100..1000&display=swap"
+		rel="stylesheet"
+	/>
+	<style>
+		body {
+			margin: 0;
+			background: #0b0b12;
+			color: #f4f4f8;
+			font-family: 'Roboto Flex', system-ui, sans-serif;
+		}
+		/* Tall scroll runway so there is room to build up scroll velocity. */
+		.spacer { height: 120vh; display: flex; align-items: center; justify-content: center; opacity: 0.4; }
+		.stage { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0 6vw; }
+		h1 {
+			margin: 0;
+			font-size: clamp(2.5rem, 9vw, 8rem);
+			line-height: 1.05;
+			text-align: center;
+			/* Start at the at-rest end of the ranges so the change on scroll is obvious. */
+			font-variation-settings: 'wght' 300, 'opsz' 12, 'slnt' 0;
+			will-change: font-variation-settings, letter-spacing, opacity, transform;
+		}
+	</style>
+</head>
+<body>
+	<div class="spacer">Scroll down — fast — to drive the effect ↓</div>
+
+	<div class="stage">
+		<!-- One element opts in via data-stabiltype; data-st-* attributes exercise several options. -->
+		<h1
+			data-stabiltype
+			data-st-tracking-range="0,0.08"
+			data-st-weight-range="300,700"
+			data-st-opsz-range="12,32"
+			data-st-opacity-range="1,0.65"
+			data-st-slnt-range="6,-6"
+			data-st-smoothing="0.2"
+			data-st-velocity-max="14"
+			data-st-perspective="500"
+			data-st-tilt="4"
+		>Motion sharpens the type</h1>
+	</div>
+
+	<div class="spacer">↑ Scroll back up to see it tilt the other way</div>
+
+	<!-- The built IIFE bundle. Run `npm run build:webflow` first to produce dist/stabiltype.webflow.min.js. -->
+	<script src="../dist/stabiltype.webflow.min.js"></script>
+</body>
+</html>
