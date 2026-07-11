@@ -5,6 +5,7 @@ import ToolDirectory from "@/components/ToolDirectory"
 import { version } from "../../../package.json"
 import { version as siteVersion } from "../../package.json"
 import SiteFooter from "../components/SiteFooter"
+import PortsSection from "../components/PortsSection"
 import { MagnetChar } from "@liiift-studio/magnettype"
 
 export default function Home() {
@@ -159,6 +160,13 @@ stop() // cancel loop and restore styles`} />
 					</p>
 				</div>
 			</section>
+
+			<PortsSection
+				npm="@liiift-studio/stabiltype"
+				bundle="stabiltype"
+				attr="data-stabiltype"
+				repo="Liiift-Studio/StabilType"
+			/>
 
 			<SiteFooter current="stabilType" npmVersion={version} siteVersion={siteVersion} />
 
