@@ -79,7 +79,7 @@
 	"homepage": "https://stabiltype.com",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Liiift-Studio/stabilType.git"
+		"url": "git+https://github.com/Liiift-Studio/stabilType.git"
 	},
 	"bugs": {
 		"url": "https://github.com/Liiift-Studio/stabilType/issues"
