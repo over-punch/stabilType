@@ -24,7 +24,7 @@ export default function Home() {
 				<div className="flex items-center gap-4">
 					<CopyInstall />
 					<a
-						href="https://github.com/Liiift-Studio/StabilType"
+						href="https://github.com/Liiift-Studio/stabilType"
 						target="_blank"
 						rel="noopener noreferrer"
 						aria-label="StabilType on GitHub (opens in new tab)"

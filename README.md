@@ -6,7 +6,7 @@ Motion-adaptive typography — adjusts letter-spacing, weight, optical size, sla
 
 ![stabilType: a paragraph reacting to scroll velocity — at rest it sits light and flat, then loosens its tracking, gains weight, and tilts back in perspective as the scroll accelerates, settling again when motion stops](https://raw.githubusercontent.com/Liiift-Studio/stabilType/master/assets/hero.gif?v=1)
 
-**▶ [See it live at stabiltype.com](https://stabiltype.com)** — scroll the page (or move your cursor / tilt your phone) to feel it. · [npm](https://www.npmjs.com/package/@liiift-studio/stabiltype) · [GitHub](https://github.com/Liiift-Studio/StabilType)
+**▶ [See it live at stabiltype.com](https://stabiltype.com)** — scroll the page (or move your cursor / tilt your phone) to feel it. · [npm](https://www.npmjs.com/package/@liiift-studio/stabiltype) · [GitHub](https://github.com/Liiift-Studio/stabilType)
 
 TypeScript · Zero dependencies · ~1.9 kB min+gzip · React + Vanilla JS
 
