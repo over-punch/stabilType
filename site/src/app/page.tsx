@@ -131,7 +131,7 @@ stop() // cancel loop and restore styles`} />
 									<th className="pb-2 font-normal">Description</th>
 								</tr>
 							</thead>
-							<tbody className="text-muted zebra-bleed">
+							<tbody className="text-muted zebra">
 								<tr className="hover:bg-foreground/5 transition-colors"><td className="py-2 pr-6 font-mono">trackingRange</td><td className="py-2 pr-6">[0, 0.06]</td><td className="py-2">Letter-spacing range in em: [at rest, at max velocity].</td></tr>
 								<tr className="hover:bg-foreground/5 transition-colors"><td className="py-2 pr-6 font-mono">weightRange</td><td className="py-2 pr-6">[300, 600]</td><td className="py-2">wght axis range: [at rest, at max velocity].</td></tr>
 								<tr className="hover:bg-foreground/5 transition-colors"><td className="py-2 pr-6 font-mono">opszRange</td><td className="py-2 pr-6">[12, 24]</td><td className="py-2">opsz axis range: [at rest, at max velocity].</td></tr>
