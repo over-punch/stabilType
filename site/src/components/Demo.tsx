@@ -2,6 +2,7 @@
 
 // Demo: scroll velocity (both axes) drives perspective compression, directional tilt, and font adaptation
 import { useState, useEffect, useRef, useCallback } from "react"
+import { useMediaQuery, useClientValue } from "@/lib/clientValue"
 import { startStabilType } from "@liiift-studio/stabiltype"
 import type { StabilTypeOptions, Velocity2D } from "@liiift-studio/stabiltype"
 
@@ -53,13 +54,10 @@ export default function Demo() {
 
 	const [cursorMode, setCursorMode] = useState(false)
 	const [gyroMode, setGyroMode] = useState(false)
-	const [showCursor, setShowCursor] = useState(false)
-	const [showGyro, setShowGyro] = useState(false)
-
-	useEffect(() => {
-		setShowCursor(window.matchMedia('(hover: hover)').matches)
-		setShowGyro(window.matchMedia('(hover: none)').matches && 'DeviceMotionEvent' in window)
-	}, [])
+	const showCursor = useMediaQuery('(hover: hover)')
+	const isTouch = useMediaQuery('(hover: none)')
+	const hasMotion = useClientValue(() => 'DeviceMotionEvent' in window, false)
+	const showGyro = isTouch && hasMotion
 
 	// Wire startStabilType — swap between built-in scroll and external source on mode change
 	useEffect(() => {
@@ -147,7 +145,6 @@ export default function Demo() {
 		}
 	}, [gyroMode])
 
-	const activeMode = cursorMode || gyroMode
 
 	return (
 		<div className="w-full flex flex-col gap-8">
@@ -231,7 +228,7 @@ export default function Demo() {
 			</div>
 
 			{/* Live readout */}
-			<LiveReadout cardRef={cardRef} activeMode={activeMode} />
+			<LiveReadout cardRef={cardRef} />
 		</div>
 	)
 }
@@ -239,10 +236,8 @@ export default function Demo() {
 /** Polls el.style directly each frame — always matches what's applied */
 function LiveReadout({
 	cardRef,
-	activeMode,
 }: {
 	cardRef: React.RefObject<HTMLDivElement | null>
-	activeMode: boolean
 }) {
 	const [vals, setVals] = useState({
 		perspective: 5000,
