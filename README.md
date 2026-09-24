@@ -1,12 +1,12 @@
 # stabilType
 
-[![npm](https://img.shields.io/npm/v/%40liiift-studio%2Fstabiltype.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![bundle size](https://img.shields.io/badge/min%2Bgzip-~1.9%20kB-44cc66.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/Liiift-Studio/type-tools)
+[![npm](https://img.shields.io/npm/v/%40overpunch%2Fstabiltype.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![bundle size](https://img.shields.io/badge/min%2Bgzip-~1.9%20kB-44cc66.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/over-punch/type-tools)
 
 Motion-adaptive typography — adjusts letter-spacing, weight, optical size, slant, opacity, and perspective tilt in real time based on scroll velocity and device motion. Faster movement loosens tracking, increases weight, and tilts the type away; slower movement returns to rest. The text physically registers the energy of reading.
 
-![stabilType: a paragraph reacting to scroll velocity — at rest it sits light and flat, then loosens its tracking, gains weight, and tilts back in perspective as the scroll accelerates, settling again when motion stops](https://raw.githubusercontent.com/Liiift-Studio/stabilType/master/assets/hero.gif?v=1)
+![stabilType: a paragraph reacting to scroll velocity — at rest it sits light and flat, then loosens its tracking, gains weight, and tilts back in perspective as the scroll accelerates, settling again when motion stops](https://raw.githubusercontent.com/over-punch/stabilType/master/assets/hero.gif?v=1)
 
-**▶ [See it live at stabiltype.com](https://stabiltype.com)** — scroll the page (or move your cursor / tilt your phone) to feel it. · [npm](https://www.npmjs.com/package/@overpunch/stabiltype) · [GitHub](https://github.com/Liiift-Studio/stabilType)
+**▶ [See it live at stabiltype.com](https://stabiltype.com)** — scroll the page (or move your cursor / tilt your phone) to feel it. · [npm](https://www.npmjs.com/package/@overpunch/stabiltype) · [GitHub](https://github.com/over-punch/stabilType)
 
 TypeScript · Zero dependencies · ~1.9 kB min+gzip · React + Vanilla JS
 
@@ -14,7 +14,7 @@ TypeScript · Zero dependencies · ~1.9 kB min+gzip · React + Vanilla JS
 
 The same paragraph at three downward-scroll speeds (velocity `0`, `0.5`, `1.0`). Weight climbs `300 → 800`, optical size opens up, and the tracking loosens as velocity rises — every value is `lerp`-interpolated from the velocity through the option ranges below. (These captures push `weightRange` to `[300, 800]` to make the ramp obvious; the library default is `[300, 600]`.)
 
-![Three copies of the same paragraph stacked vertically: at rest (velocity 0) it is light with tight tracking; at velocity 0.5 the weight and spacing increase; at velocity 1.0 it is bold with the widest tracking](https://raw.githubusercontent.com/Liiift-Studio/stabilType/master/assets/states.png?v=1)
+![Three copies of the same paragraph stacked vertically: at rest (velocity 0) it is light with tight tracking; at velocity 0.5 the weight and spacing increase; at velocity 1.0 it is bold with the widest tracking](https://raw.githubusercontent.com/over-punch/stabilType/master/assets/states.png?v=1)
 
 ---
 

@@ -29,7 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 	return (
 		<html lang="en" className="h-full antialiased">
 			<body className="min-h-full flex flex-col">
-				<SiteHeader current="stabilType" githubUrl="https://github.com/Liiift-Studio/stabilType" />{children}</body>
+				<SiteHeader current="stabilType" githubUrl="https://github.com/over-punch/stabilType" />{children}</body>
 		</html>
 	)
 }
