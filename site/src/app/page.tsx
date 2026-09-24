@@ -14,7 +14,7 @@ export default function Home() {
 			<Hero
 				eyebrow="motion-reactive type"
 				title={[{ text: "Motion adapts" }, { text: "your type.", italic: true, subtle: true }]}
-				install="@liiift-studio/stabiltype"
+				install="@overpunch/stabiltype"
 				github="https://github.com/Liiift-Studio/stabilType"
 				tech={["TypeScript", "Zero dependencies", "React + Vanilla JS"]}
 			>
@@ -63,7 +63,7 @@ export default function Home() {
 				<div className="flex flex-col gap-8 text-sm">
 					<div className="flex flex-col gap-3">
 						<p className="text-muted">Drop-in component</p>
-						<CodeBlock code={`import { StabilTypeText, useScrollVelocity } from '@liiift-studio/stabiltype'
+						<CodeBlock code={`import { StabilTypeText, useScrollVelocity } from '@overpunch/stabiltype'
 
 // useScrollVelocity returns a Velocity2D ref updated each frame
 const velocity = useScrollVelocity()
@@ -74,7 +74,7 @@ const velocity = useScrollVelocity()
 					</div>
 					<div className="flex flex-col gap-3">
 						<p className="text-muted">Hook — attach to any element</p>
-						<CodeBlock code={`import { useStabilType, useScrollVelocity } from '@liiift-studio/stabiltype'
+						<CodeBlock code={`import { useStabilType, useScrollVelocity } from '@overpunch/stabiltype'
 import { useRef } from 'react'
 
 // useScrollVelocity returns a Velocity2D ref ({ x, y }) updated each frame
@@ -85,7 +85,7 @@ useStabilType(ref, velocity, { weightRange: [300, 700] })
 					</div>
 					<div className="flex flex-col gap-3">
 						<p className="text-muted">rAF loop — vanilla JS with IMU callback</p>
-						<CodeBlock code={`import { startStabilType } from '@liiift-studio/stabiltype'
+						<CodeBlock code={`import { startStabilType } from '@overpunch/stabiltype'
 
 const el = document.querySelector('h1')
 
@@ -144,7 +144,7 @@ stop() // cancel loop and restore styles`} />
 			</section>
 
 			<PortsSection
-				npm="@liiift-studio/stabiltype"
+				npm="@overpunch/stabiltype"
 				bundle="stabiltype"
 				attr="data-stabiltype"
 				repo="Liiift-Studio/StabilType"

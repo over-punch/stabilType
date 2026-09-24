@@ -3,8 +3,8 @@
 // Demo: scroll velocity (both axes) drives perspective compression, directional tilt, and font adaptation
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useMediaQuery, useClientValue } from "@/lib/clientValue"
-import { startStabilType } from "@liiift-studio/stabiltype"
-import type { StabilTypeOptions, Velocity2D } from "@liiift-studio/stabiltype"
+import { startStabilType } from "@overpunch/stabiltype"
+import type { StabilTypeOptions, Velocity2D } from "@overpunch/stabiltype"
 
 // Hoisted regex constants — reused each rAF tick rather than re-created
 const RE_PERSPECTIVE = /perspective\((\d+)px\)/

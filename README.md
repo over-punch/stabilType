@@ -1,12 +1,12 @@
 # stabilType
 
-[![npm](https://img.shields.io/npm/v/%40liiift-studio%2Fstabiltype.svg)](https://www.npmjs.com/package/@liiift-studio/stabiltype) [![bundle size](https://img.shields.io/badge/min%2Bgzip-~1.9%20kB-44cc66.svg)](https://www.npmjs.com/package/@liiift-studio/stabiltype) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/Liiift-Studio/type-tools)
+[![npm](https://img.shields.io/npm/v/%40liiift-studio%2Fstabiltype.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![bundle size](https://img.shields.io/badge/min%2Bgzip-~1.9%20kB-44cc66.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/Liiift-Studio/type-tools)
 
 Motion-adaptive typography — adjusts letter-spacing, weight, optical size, slant, opacity, and perspective tilt in real time based on scroll velocity and device motion. Faster movement loosens tracking, increases weight, and tilts the type away; slower movement returns to rest. The text physically registers the energy of reading.
 
 ![stabilType: a paragraph reacting to scroll velocity — at rest it sits light and flat, then loosens its tracking, gains weight, and tilts back in perspective as the scroll accelerates, settling again when motion stops](https://raw.githubusercontent.com/Liiift-Studio/stabilType/master/assets/hero.gif?v=1)
 
-**▶ [See it live at stabiltype.com](https://stabiltype.com)** — scroll the page (or move your cursor / tilt your phone) to feel it. · [npm](https://www.npmjs.com/package/@liiift-studio/stabiltype) · [GitHub](https://github.com/Liiift-Studio/stabilType)
+**▶ [See it live at stabiltype.com](https://stabiltype.com)** — scroll the page (or move your cursor / tilt your phone) to feel it. · [npm](https://www.npmjs.com/package/@overpunch/stabiltype) · [GitHub](https://github.com/Liiift-Studio/stabilType)
 
 TypeScript · Zero dependencies · ~1.9 kB min+gzip · React + Vanilla JS
 
@@ -21,7 +21,7 @@ The same paragraph at three downward-scroll speeds (velocity `0`, `0.5`, `1.0`).
 ## Install
 
 ```bash
-npm install @liiift-studio/stabiltype
+npm install @overpunch/stabiltype
 ```
 
 ---
@@ -35,7 +35,7 @@ npm install @liiift-studio/stabiltype
 `StabilTypeText` is a controlled component — pass it a `velocity` value and it adapts the typography accordingly. Velocity is a signed scalar from `–1` to `+1`: the **magnitude** drives the speed-based effects (weight, optical size, tracking, opacity) while the **sign** drives the directional ones (slant, tilt) — `0` is at rest, `+1` is peak downward/forward motion, `–1` is peak upward/backward. Compute velocity however you like (scroll delta, `devicemotion`, a spring simulation) and re-render. For a turnkey scroll source, see [Driving from scroll in React](#driving-from-scroll-in-react) below.
 
 ```tsx
-import { StabilTypeText } from '@liiift-studio/stabiltype'
+import { StabilTypeText } from '@overpunch/stabiltype'
 
 <StabilTypeText
   velocity={scrollVelocity}
@@ -53,7 +53,7 @@ import { StabilTypeText } from '@liiift-studio/stabiltype'
 
 ```tsx
 "use client"
-import { useStabilType } from '@liiift-studio/stabiltype'
+import { useStabilType } from '@overpunch/stabiltype'
 import { useRef } from 'react'
 
 export default function Demo({ velocity }: { velocity: number }) {
@@ -124,7 +124,7 @@ Feed it straight into the component:
 
 ```tsx
 "use client"
-import { StabilTypeText } from '@liiift-studio/stabiltype'
+import { StabilTypeText } from '@overpunch/stabiltype'
 
 export default function Hero() {
   const velocity = useScrollVelocity()
@@ -141,7 +141,7 @@ If all you want is **scroll-driven** behaviour with no custom velocity source, t
 `startStabilType` is the self-contained entry point. It starts a `requestAnimationFrame` loop, reads scroll velocity each frame, and updates the element's typography. Returns a `stop` function.
 
 ```ts
-import { startStabilType, removeStabilType } from '@liiift-studio/stabiltype'
+import { startStabilType, removeStabilType } from '@overpunch/stabiltype'
 
 const el = document.querySelector('p')
 const stop = startStabilType(el, {
@@ -158,7 +158,7 @@ removeStabilType(el)
 To drive from an external velocity source (device motion, pointer tracking, a physics engine), pass a velocity callback. `startStabilType` calls it every animation frame:
 
 ```ts
-import { startStabilType } from '@liiift-studio/stabiltype'
+import { startStabilType } from '@overpunch/stabiltype'
 
 const el = document.querySelector('p')
 
@@ -177,7 +177,7 @@ const stop = startStabilType(el, () => currentVelocity, {
 For manual control — drive velocity yourself from any source:
 
 ```ts
-import { applyStabilType, removeStabilType } from '@liiift-studio/stabiltype'
+import { applyStabilType, removeStabilType } from '@overpunch/stabiltype'
 
 const el = document.querySelector('p')
 
@@ -198,7 +198,7 @@ removeStabilType(el)
 ### TypeScript
 
 ```ts
-import type { StabilTypeOptions, Velocity2D } from '@liiift-studio/stabiltype'
+import type { StabilTypeOptions, Velocity2D } from '@overpunch/stabiltype'
 
 const opts: StabilTypeOptions = {
   trackingRange: [0, 0.06],
@@ -252,7 +252,7 @@ const velocity: Velocity2D = { x: 0, y: 0.7 }
 
 ```tsx
 "use client"
-import { StabilTypeText } from '@liiift-studio/stabiltype'
+import { StabilTypeText } from '@overpunch/stabiltype'
 import { useScrollVelocity } from './useScrollVelocity' // from "Driving from scroll in React" above
 
 export default function Hero() {
@@ -289,7 +289,7 @@ Passing `0` keeps the type at its at-rest values, so the content stays fully leg
 
 ```tsx
 "use client"
-import { StabilTypeText } from '@liiift-studio/stabiltype'
+import { StabilTypeText } from '@overpunch/stabiltype'
 ```
 
 ---
