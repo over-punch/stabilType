@@ -15,7 +15,7 @@ export default function Home() {
 				eyebrow="motion-reactive type"
 				title={[{ text: "Motion adapts" }, { text: "your type.", italic: true, subtle: true }]}
 				install="@overpunch/stabiltype"
-				github="https://github.com/Liiift-Studio/stabilType"
+				github="https://github.com/over-punch/stabilType"
 				tech={["TypeScript", "Zero dependencies", "React + Vanilla JS"]}
 			>
 				<p className="text-base leading-relaxed max-w-lg">
@@ -147,7 +147,7 @@ stop() // cancel loop and restore styles`} />
 				npm="@overpunch/stabiltype"
 				bundle="stabiltype"
 				attr="data-stabiltype"
-				repo="Liiift-Studio/StabilType"
+				repo="over-punch/StabilType"
 			/>
 
 			<SiteFooter current="stabilType" npmVersion={version} siteVersion={siteVersion} />
