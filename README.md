@@ -1,14 +1,14 @@
 # stabilType
 
-[![npm](https://img.shields.io/npm/v/%40overpunch%2Fstabiltype.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![bundle size](https://img.shields.io/badge/min%2Bgzip-~1.9%20kB-44cc66.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/over-punch/type-tools)
+[![npm](https://img.shields.io/npm/v/%40overpunch%2Fstabiltype.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![bundle size](https://img.shields.io/badge/min%2Bgzip-~4%20kB-44cc66.svg)](https://www.npmjs.com/package/@overpunch/stabiltype) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/over-punch/type-tools)
 
-Motion-adaptive typography — adjusts letter-spacing, weight, optical size, slant, opacity, and perspective tilt in real time based on scroll velocity and device motion. Faster movement loosens tracking, increases weight, and tilts the type away; slower movement returns to rest. The text physically registers the energy of reading.
+Motion-adaptive typography — adjusts letter-spacing, weight, optical size, slant, opacity, and perspective tilt in real time based on scroll velocity, or any velocity you supply (device motion, pointer, a physics engine). Faster movement loosens tracking, increases weight, and tilts the type away; slower movement returns to rest. The text physically registers the energy of reading.
 
 ![stabilType: a paragraph reacting to scroll velocity — at rest it sits light and flat, then loosens its tracking, gains weight, and tilts back in perspective as the scroll accelerates, settling again when motion stops](https://raw.githubusercontent.com/over-punch/stabilType/master/assets/hero.gif?v=1)
 
 **▶ [See it live at stabiltype.com](https://stabiltype.com)** — scroll the page (or move your cursor / tilt your phone) to feel it. · [npm](https://www.npmjs.com/package/@overpunch/stabiltype) · [GitHub](https://github.com/over-punch/stabilType)
 
-TypeScript · Zero dependencies · ~1.9 kB min+gzip · React + Vanilla JS
+TypeScript · Zero dependencies · ~4 kB min+gzip · React + Vanilla JS
 
 ### What it looks like at each velocity
 
@@ -49,7 +49,7 @@ import { StabilTypeText } from '@overpunch/stabiltype'
 
 ### React hook
 
-`useStabilType` takes a ref, a velocity value, and options. It applies the typography directly to the element on every render where velocity changes, and calls `removeStabilType` automatically on unmount to restore the element's original inline styles. `StabilTypeText` wraps the hook, so it cleans up the same way.
+`useStabilType` takes a ref, a velocity value, and options. It reads the latest velocity every frame, so the text eases toward each new value and all the way back to rest, and it stops and restores the element automatically on unmount to restore the element's original inline styles. `StabilTypeText` wraps the hook, so it cleans up the same way.
 
 ```tsx
 "use client"
@@ -141,7 +141,7 @@ If all you want is **scroll-driven** behaviour with no custom velocity source, t
 `startStabilType` is the self-contained entry point. It starts a `requestAnimationFrame` loop, reads scroll velocity each frame, and updates the element's typography. Returns a `stop` function.
 
 ```ts
-import { startStabilType, removeStabilType } from '@overpunch/stabiltype'
+import { startStabilType } from '@overpunch/stabiltype/core'
 
 const el = document.querySelector('p')
 const stop = startStabilType(el, {
@@ -150,23 +150,30 @@ const stop = startStabilType(el, {
   velocityMax: 15,
 })
 
-// Later — stop the loop and restore original styles:
+// Later — stop and restore the original styles (removeStabilType(el) does the same):
 stop()
-removeStabilType(el)
 ```
 
 To drive from an external velocity source (device motion, pointer tracking, a physics engine), pass a velocity callback. `startStabilType` calls it every animation frame:
 
 ```ts
-import { startStabilType } from '@overpunch/stabiltype'
+import { startStabilType } from '@overpunch/stabiltype/core'
 
 const el = document.querySelector('p')
 
-// devicemotion example — y acceleration mapped to –1…+1
+// devicemotion example — y acceleration mapped to –1…+1. stabilType doesn't listen to device motion
+// itself; you supply it. iOS 13+ only sends motion events after DeviceMotionEvent.requestPermission(),
+// which must be called from a user gesture (a tap):
 let currentVelocity = 0
-window.addEventListener('devicemotion', (e) => {
-  currentVelocity = Math.max(-1, Math.min(1, (e.acceleration?.y ?? 0) / 9.8))
-})
+async function enableMotion() {
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    if (await DeviceMotionEvent.requestPermission() !== 'granted') return
+  }
+  window.addEventListener('devicemotion', (e) => {
+    currentVelocity = Math.max(-1, Math.min(1, (e.acceleration?.y ?? 0) / 9.8))
+  })
+}
+document.querySelector('#enable-motion').addEventListener('click', enableMotion)
 
 const stop = startStabilType(el, () => currentVelocity, {
   weightRange: [300, 700],
@@ -177,11 +184,11 @@ const stop = startStabilType(el, () => currentVelocity, {
 For manual control — drive velocity yourself from any source:
 
 ```ts
-import { applyStabilType, removeStabilType } from '@overpunch/stabiltype'
+import { applyStabilType, removeStabilType } from '@overpunch/stabiltype/core'
 
 const el = document.querySelector('p')
 
-// Call on every animation frame with the current velocity –1…+1:
+// Call on every animation frame with the current velocity –1…+1 (each call is one smoothing step):
 applyStabilType(el, scrollVelocity, {
   weightRange: [300, 700],
 })
@@ -216,29 +223,31 @@ const velocity: Velocity2D = { x: 0, y: 0.7 }
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `trackingRange` | `[number, number]` | `[0, 0.06]` | Letter-spacing in em: `[at rest, at max velocity]` |
-| `weightRange` | `[number, number]` | `[300, 600]` | `wght` axis: `[at rest, at max velocity]` |
-| `opszRange` | `[number, number]` | `[12, 24]` | `opsz` axis: `[at rest, at max velocity]` |
-| `opacityRange` | `[number, number]` | `[1, 0.7]` | Opacity: `[at rest, at max velocity]` |
-| `slntRange` | `[number, number]` | `[8, -8]` | `slnt` axis: `[at peak upscroll, at peak downscroll]` |
-| `smoothing` | `number` | `0.15` | EMA smoothing factor (0–1). Higher = more smoothing, slower response |
+| `trackingRange` | `[number, number]` | +0.06em | Letter-spacing in em: `[at rest, at max velocity]`. Unset, the text's own letter-spacing plus up to 0.06em |
+| `weightRange` | `[number, number]` | +300 | `wght` axis: `[at rest, at max velocity]`. Unset, the text's own weight plus up to 300 |
+| `opszRange` | `[number, number]` | +12 | `opsz` axis: `[at rest, at max velocity]`. Unset, the text's own optical size (its font size) plus up to 12 |
+| `opacityRange` | `[number, number]` | ×0.7 | Opacity: `[at rest, at max velocity]`, clamped to 0–1. Unset, the text's own opacity down to 70% of it |
+| `slntRange` | `[number, number]` | `[8, -8]` | `slnt` change: `[at peak upscroll, at peak downscroll]`. Many fonts only have negative slant (Roboto Flex: −10 to 0), so upscroll may show no slant |
+| `smoothing` | `number` | `0.15` | Share of each new velocity sample per frame (0–1). Higher = faster response, less lag; 1 snaps instantly, 0 freezes |
 | `velocityMax` | `number` | `15` | Scroll velocity in px/frame that maps to maximum adjustment. Only used by `startStabilType` |
 | `perspective` | `number` | `600` | CSS `perspective` depth in px at peak velocity. Controls dolly compression. Set to `0` to disable |
-| `tilt` | `number` | `3` | `rotateX` tilt in degrees at peak velocity. Direction follows scroll: downscroll tips top away, upscroll tips bottom away |
+| `tilt` | `number` | `3` | `rotateX` (vertical motion) and `rotateY` (horizontal motion) tilt in degrees at peak velocity, up to 45. Downscroll tips the top away, upscroll the bottom |
 | `weightAxis` | `string` | `'wght'` | Variable font weight axis tag |
 | `opszAxis` | `string` | `'opsz'` | Variable font optical size axis tag |
 | `slntAxis` | `string` | `'slnt'` | Variable font slant axis tag |
-| `liveBaseFVS` | `boolean` | `false` | Re-read `font-variation-settings` from the computed cascade every frame instead of snapshotting it on first activation. Only needed if external CSS changes the element's FVS at runtime; adds one `getComputedStyle()` per frame |
+| `liveBaseFVS` | `boolean` | `false` | Re-read the element's own `font-variation-settings` (from its CSS, without stabilType's inline value) every frame instead of snapshotting it on first activation. Only needed if external CSS changes the element's FVS at runtime; adds a style recalculation per frame |
 
 ---
 
 ## How it works
 
-`applyStabilType` takes a signed velocity value (–1 = max negative direction, +1 = max positive direction) and maps it through each option range using linear interpolation. The resulting values are written as `font-variation-settings` (weight, opsz, slnt), `letter-spacing`, `opacity`, and a CSS `transform` (perspective + rotateX tilt) directly on the element's inline style. The first call saves the original inline styles so `removeStabilType` can restore them exactly.
+`applyStabilType` takes a signed velocity value (–1 = max negative direction, +1 = max positive direction), smooths it, and maps it through each option range. The values are written as `font-variation-settings` (weight, opsz, slnt, keeping the element's other axes), `letter-spacing`, `opacity`, and a CSS `transform` (perspective + tilt, after the element's own transform) on the element's inline style. At rest the element carries no styles of its own (unless you set explicit ranges), so its own weight, spacing, opacity and transform show; `removeStabilType` restores the original inline styles exactly.
 
-`startStabilType` runs a `requestAnimationFrame` loop. Each frame it reads `window.scrollY`, computes the delta from the previous frame, normalises it against `velocityMax`, applies exponential moving average smoothing, then calls `applyStabilType`. The smoothing factor prevents jerky jumps on large scroll events.
+`startStabilType` uses one `requestAnimationFrame` loop and one scroll listener for every element. Each frame it measures the scroll velocity of each element's scroll container (the window, or the nearest scrolling ancestor), normalises it against `velocityMax`, smooths it, and writes the styles. Scroll caused by the browser's scroll anchoring (it compensates when the text above the viewport changes height) is not counted, so the text can't push the page along by itself. Once everything is back at rest the loop sleeps until the next scroll. An element removed from the page stops by itself.
 
-**2D velocity:** Pass a `Velocity2D { x, y }` object to `applyStabilType` or `useStabilType` for device-motion or horizontal-scroll scenarios. The `y` component drives the main axis adaptations; `x` drives the `slnt` tilt independently.
+**2D velocity:** Pass a `Velocity2D { x, y }` object for device-motion or horizontal-scroll scenarios. Speed (the magnitude of both) drives weight, optical size, tracking and opacity; `y` drives `slnt` and `rotateX`; `x` drives `rotateY`.
+
+**Layout:** letter-spacing and weight change the text's width, so lines rewrap while the text moves (in our test a paragraph went from 9 to 11 lines mid-scroll; layout shift 0.21). For no reflow, keep only the effects that don't change width: set `trackingRange: [0, 0]` and an equal `weightRange` (e.g. `[400, 400]`), or use opacity and tilt alone. While the text moves, its `transform` makes `position: fixed` children position relative to it; set `perspective: 0` if the element contains any. At peak the default opacity (70% of the text's own) can drop grey text below WCAG AA contrast.
 
 **Variable font requirement:** The weight, opsz, and slant effects require a variable font exposing those axes. stabilType always writes `font-variation-settings`; on a font without a given axis the browser simply ignores it, so the effect degrades to whatever the font *does* support plus the always-available opacity and letter-spacing. There is no axis sniffing — load a variable font (with the axes you reference) to get the full effect.
 
@@ -246,9 +255,9 @@ const velocity: Velocity2D = { x: 0, y: 0.7 }
 
 ## Accessibility
 
-**`startStabilType` honours `prefers-reduced-motion`.** When the user's OS-level "reduce motion" setting is on, `startStabilType` returns a no-op and never starts its animation loop — no scroll listener, no style writes.
+**`startStabilType`, `useStabilType` and `StabilTypeText` honour `prefers-reduced-motion`.** When the user's OS-level "reduce motion" setting is on, they never start — no scroll listener, no style writes — and turning it on while they run stops them and restores the element.
 
-**The lower-level APIs do not gate themselves.** `applyStabilType`, `useStabilType`, and `StabilTypeText` apply exactly what you pass them every frame — they have no reduced-motion check, because you own the velocity source. If you drive them yourself, honour the preference at the source so motion-sensitive users aren't animated against their wishes:
+**`applyStabilType` does not gate itself.** It applies exactly what you pass it, because you own the velocity source. If you drive it yourself, honour the preference at the source. You can also do that in React, so the velocity source does no work:
 
 ```tsx
 "use client"

@@ -6,13 +6,13 @@ import dts from 'vite-plugin-dts'
 export default defineConfig({
 	plugins: [
 		react(),
-		dts({ include: ['src'], exclude: ['src/__tests__/**'], rollupTypes: true }),
+		dts({ include: ['src'], exclude: ['src/__tests__/**', 'src/webflow/**'], rollupTypes: true }),
 	],
 	build: {
 		lib: {
-			entry: 'src/index.ts',
+			entry: { index: 'src/index.ts', core: 'src/core.ts' },
 			formats: ['es', 'cjs'],
-			fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
+			fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
 		},
 		rollupOptions: {
 			external: ['react', 'react-dom', 'react/jsx-runtime'],
