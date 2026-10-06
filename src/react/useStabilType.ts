@@ -1,37 +1,39 @@
-// stabilType/src/react/useStabilType.ts — React hook for stabilType
+// stabilType/src/react/useStabilType.ts — React hook for stabilType: runs the shared loop on the element
+// with the latest velocity, so the text eases to each new value and all the way back to rest.
 import { useEffect, useRef, type RefObject } from 'react'
-import { applyStabilType, removeStabilType } from '../core/adjust'
+import { startStabilType } from '../core/adjust'
 import type { StabilTypeOptions, Velocity2D } from '../core/types'
 
 /**
- * React hook that applies motion-adaptive typography to a referenced element
- * whenever the velocity prop changes.
+ * React hook that applies motion-adaptive typography to a referenced element. The velocity is read every
+ * frame, so the text keeps easing (and returns fully to rest) between renders. Restarts when the options
+ * or the element change; stops and restores the element on unmount.
  *
  * @param ref      - Ref to the target HTMLElement
- * @param velocity - Signed scalar –1…+1 or Velocity2D { x, y } (updated on each render)
+ * @param velocity - Signed scalar –1…+1 or Velocity2D { x, y } (the latest render's value is used)
  * @param options  - StabilTypeOptions
  */
 export function useStabilType(ref: RefObject<HTMLElement | null>, velocity: number | Velocity2D, options?: StabilTypeOptions): void {
-	// Keep a stable ref to options so the apply effect always reads the latest values
-	// without triggering re-runs on every object identity change.
-	const optionsRef = useRef<StabilTypeOptions | undefined>(options)
-	optionsRef.current = options
+	const velocityRef = useRef(velocity)
+	velocityRef.current = velocity
+	const optionsKey = JSON.stringify(options ?? {})
+	const running = useRef<{ el: HTMLElement; key: string; stop: () => void } | null>(null)
 
-	// Serialise velocity so the effect only re-runs when the value actually changes
-	const vx = typeof velocity === 'object' ? velocity.x : 0
-	const vy = typeof velocity === 'object' ? velocity.y : velocity
-
+	// Every render: (re)start when the element or the options changed.
 	useEffect(() => {
 		const el = ref.current
+		const current = running.current
+		if (current && current.el === el && current.key === optionsKey) return
+		current?.stop()
+		running.current = null
 		if (!el) return
-		applyStabilType(el, velocity, optionsRef.current)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [vx, vy])
+		const stop = startStabilType(el, () => velocityRef.current, JSON.parse(optionsKey) as StabilTypeOptions)
+		running.current = { el, key: optionsKey, stop }
+	})
 
-	useEffect(() => {
-		return () => {
-			const el = ref.current
-			if (el) removeStabilType(el)
-		}
+	// Stop on unmount.
+	useEffect(() => () => {
+		running.current?.stop()
+		running.current = null
 	}, [])
 }
