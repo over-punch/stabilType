@@ -107,7 +107,7 @@ describe('applyStabilType', () => {
 		applyStabilType(el, 1, {
 			weightAxis: 'WGHT',
 			opszAxis: 'OPSZ',
-			smoothing: 0,
+			smoothing: 1, // 1 = snap to the input (0 would freeze the velocity at rest)
 		})
 		expect(el.style.fontVariationSettings).toContain('"WGHT"')
 		expect(el.style.fontVariationSettings).toContain('"OPSZ"')
@@ -140,10 +140,11 @@ describe('startStabilType — getVelocity callback form', () => {
 	it('calls getVelocity on each frame and applies styles', () => {
 		const el = makeEl()
 		const getVelocity = vi.fn(() => 0.5)
-		startStabilType(el, getVelocity)
+		const stop = startStabilType(el, getVelocity)
 		expect(getVelocity).toHaveBeenCalled()
 		// After applying velocity=0.5, FVS should have been written
 		expect(el.style.fontVariationSettings).toContain('"wght"')
+		stop()
 	})
 
 	it('cleanup calls cancelAnimationFrame and removeStabilType', () => {
@@ -197,17 +198,20 @@ describe('startStabilType — built-in scroll form', () => {
 		vi.unstubAllGlobals()
 	})
 
-	it('adds a scroll listener on start', () => {
+	it('adds one shared scroll listener (capturing scrolls from any container) on start', () => {
+		const add = vi.spyOn(document, 'addEventListener')
 		const el = makeEl()
-		startStabilType(el)
-		expect(window.addEventListener).toHaveBeenCalledWith('scroll', expect.any(Function), { passive: true })
+		const stop = startStabilType(el)
+		expect(add).toHaveBeenCalledWith('scroll', expect.any(Function), { capture: true, passive: true })
+		stop()
 	})
 
-	it('cleanup removes the scroll listener', () => {
+	it('cleanup removes the scroll listener when the last element stops', () => {
+		const remove = vi.spyOn(document, 'removeEventListener')
 		const el = makeEl()
 		const stop = startStabilType(el)
 		stop()
-		expect(window.removeEventListener).toHaveBeenCalledWith('scroll', expect.any(Function))
+		expect(remove).toHaveBeenCalledWith('scroll', expect.any(Function), { capture: true })
 	})
 })
 
@@ -228,7 +232,7 @@ describe('removeStabilType', () => {
 		el.style.letterSpacing = '0.02em'
 		el.style.opacity = '0.9'
 
-		applyStabilType(el, 0.5, { smoothing: 0 })
+		applyStabilType(el, 0.5, { smoothing: 1 })
 		// Styles should have been changed
 		expect(el.style.fontVariationSettings).not.toBe('"wght" 350')
 
@@ -245,5 +249,62 @@ describe('removeStabilType', () => {
 		// Should not throw
 		removeStabilType(el)
 		expect(el.style.opacity).toBe('1')
+	})
+})
+
+// ─── Review fixes (2026-10) ──────────────────────────────────────────────────
+
+describe('review fixes', () => {
+	afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
+
+	/** A real element in the document. */
+	function realEl(): HTMLElement {
+		const el = document.createElement('p')
+		el.textContent = 'Typography in motion'
+		document.body.appendChild(el)
+		return el
+	}
+
+	it("returns to the author's own styles at rest (no inline styles, no transform)", () => {
+		const el = realEl()
+		for (let i = 0; i < 5; i++) applyStabilType(el, 1, { smoothing: 1 })
+		expect(el.style.transform).not.toBe('')
+		applyStabilType(el, 0, { smoothing: 1 })
+		expect(el.getAttribute('style')).toBeNull()
+	})
+
+	it('a NaN velocity counts as 0 and does not poison later frames', () => {
+		const el = realEl()
+		applyStabilType(el, NaN, { smoothing: 1 })
+		applyStabilType(el, 0.5, { smoothing: 1 })
+		expect(el.style.fontVariationSettings).toContain('"wght"')
+	})
+
+	it('rejects axis tags that are not four letters, with a warning', () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+		const el = realEl()
+		applyStabilType(el, 1, { smoothing: 1, weightAxis: 'wght" 900, "XOPQ' })
+		expect(el.style.fontVariationSettings).not.toContain('XOPQ')
+		expect(warn).toHaveBeenCalled()
+	})
+
+	it('clamps opacity ranges and tilt', () => {
+		const el = realEl()
+		applyStabilType(el, 1, { smoothing: 1, opacityRange: [1, -5], tilt: 1e6 })
+		expect(parseFloat(el.style.opacity)).toBe(0)
+		expect(el.style.transform).toContain('rotateX(-45')
+	})
+
+	it('removeStabilType stops a running loop', () => {
+		Object.defineProperty(window, 'matchMedia', { writable: true, configurable: true, value: () => ({ matches: false }) })
+		let pending: FrameRequestCallback | null = null
+		vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => { pending = cb; return 7 })
+		vi.stubGlobal('cancelAnimationFrame', vi.fn())
+		const el = realEl()
+		startStabilType(el, () => 1, { smoothing: 1 })
+		removeStabilType(el)
+		const cb = pending as FrameRequestCallback | null
+		cb?.(16)
+		expect(el.getAttribute('style')).toBeNull()
 	})
 })
